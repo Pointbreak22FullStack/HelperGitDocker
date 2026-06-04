@@ -1,0 +1,19 @@
+{
+  "Organization": "your-org-name",
+  "GitHost": "github.com",
+  "GitRootPath": "..",
+  "DockerComposeFile": "docker-compose.yml",
+  "UseDockerCompose": true,
+  "Repositories": [
+    {
+      "Name": "Api",
+      "Path": "../Api",
+      "CloneUrl": "https://github.com/your-org-name/WebParserApi.git"
+    },
+    {
+      "Name": "Client",
+      "Path": "../Client/web-parser-client",
+      "CloneUrl": "https://github.com/your-org-name/WebParserClient.git"
+    }
+  ]
+}

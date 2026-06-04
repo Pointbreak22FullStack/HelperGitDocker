@@ -1,0 +1,62 @@
+services:
+  api:
+    build:
+      context: ../Api/WebParserApi/WebApi
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=webparser;Username=webparser;Password=Secret123!
+      - Redis__Configuration=redis:6379
+      - Camoufox__Endpoint=http://camoufox:3000
+    depends_on:
+      - postgres
+      - redis
+      - camoufox
+
+  client:
+    build:
+      context: ../Client/web-parser-client
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"
+    environment:
+      - API_BASE_URL=http://api:80
+    depends_on:
+      - api
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=webparser
+      - POSTGRES_PASSWORD=Secret123!
+      - POSTGRES_DB=webparser
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  camoufox:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+      - "9222:9222"
+      - "5900:5900"
+      - "6080:6080"
+    shm_size: "2gb"
+    environment:
+      - DISPLAY=:99
+    restart: unless-stopped
+
+volumes:
+  postgres_data:

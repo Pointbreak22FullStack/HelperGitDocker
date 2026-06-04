@@ -1,0 +1,14 @@
+E:\Projects\Orders\WebParser\HelperGitDocker\bin\Debug\net10.0\HelperGitDocker.exe
+E:\Projects\Orders\WebParser\HelperGitDocker\bin\Debug\net10.0\HelperGitDocker.deps.json
+E:\Projects\Orders\WebParser\HelperGitDocker\bin\Debug\net10.0\HelperGitDocker.runtimeconfig.json
+E:\Projects\Orders\WebParser\HelperGitDocker\bin\Debug\net10.0\HelperGitDocker.dll
+E:\Projects\Orders\WebParser\HelperGitDocker\bin\Debug\net10.0\HelperGitDocker.pdb
+E:\Projects\Orders\WebParser\HelperGitDocker\obj\Debug\net10.0\HelperGitDocker.GeneratedMSBuildEditorConfig.editorconfig
+E:\Projects\Orders\WebParser\HelperGitDocker\obj\Debug\net10.0\HelperGitDocker.AssemblyInfoInputs.cache
+E:\Projects\Orders\WebParser\HelperGitDocker\obj\Debug\net10.0\HelperGitDocker.AssemblyInfo.cs
+E:\Projects\Orders\WebParser\HelperGitDocker\obj\Debug\net10.0\HelperGitDocker.csproj.CoreCompileInputs.cache
+E:\Projects\Orders\WebParser\HelperGitDocker\obj\Debug\net10.0\HelperGitDocker.dll
+E:\Projects\Orders\WebParser\HelperGitDocker\obj\Debug\net10.0\refint\HelperGitDocker.dll
+E:\Projects\Orders\WebParser\HelperGitDocker\obj\Debug\net10.0\HelperGitDocker.pdb
+E:\Projects\Orders\WebParser\HelperGitDocker\obj\Debug\net10.0\HelperGitDocker.genruntimeconfig.cache
+E:\Projects\Orders\WebParser\HelperGitDocker\obj\Debug\net10.0\ref\HelperGitDocker.dll
