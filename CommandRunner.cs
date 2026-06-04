@@ -4,7 +4,7 @@ namespace HelperGitDocker;
 
 internal static class CommandRunner
 {
-    public static int Run(string fileName, string arguments, string? workingDirectory = null)
+    public static int Run(string fileName, string arguments, string? workingDirectory = null, IReadOnlyDictionary<string, string>? environmentVariables = null)
     {
         try
         {
@@ -21,6 +21,17 @@ internal static class CommandRunner
             if (!string.IsNullOrWhiteSpace(workingDirectory))
             {
                 startInfo.WorkingDirectory = workingDirectory;
+            }
+
+            if (environmentVariables != null)
+            {
+                foreach (var kvp in environmentVariables)
+                {
+                    if (!string.IsNullOrWhiteSpace(kvp.Key))
+                    {
+                        startInfo.Environment[kvp.Key] = kvp.Value;
+                    }
+                }
             }
 
             using var process = Process.Start(startInfo);

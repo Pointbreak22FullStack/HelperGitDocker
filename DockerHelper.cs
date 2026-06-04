@@ -16,7 +16,7 @@ internal sealed class DockerHelper
         if (_config.UseDockerCompose && TryGetComposePath(out var composeFilePath))
         {
             Console.WriteLine($"Using Docker Compose file: {composeFilePath}");
-            CommandRunner.Run("docker", $"compose build", Path.GetDirectoryName(composeFilePath));
+            CommandRunner.Run("docker", "compose build", Path.GetDirectoryName(composeFilePath), GetComposeEnvironment());
             return;
         }
 
@@ -52,7 +52,7 @@ internal sealed class DockerHelper
 
         var composeDir = Path.GetDirectoryName(composeFilePath);
         Console.WriteLine($"Starting Docker Compose in {composeDir}...");
-        CommandRunner.Run("docker", "compose up -d", composeDir);
+        CommandRunner.Run("docker", "compose up -d", composeDir, GetComposeEnvironment());
     }
 
     public void DownAll()
@@ -65,7 +65,7 @@ internal sealed class DockerHelper
 
         var composeDir = Path.GetDirectoryName(composeFilePath);
         Console.WriteLine($"Stopping Docker Compose in {composeDir}...");
-        CommandRunner.Run("docker", "compose down", composeDir);
+        CommandRunner.Run("docker", "compose down", composeDir, GetComposeEnvironment());
     }
 
     public void LogsAll()
@@ -78,7 +78,34 @@ internal sealed class DockerHelper
 
         var composeDir = Path.GetDirectoryName(composeFilePath);
         Console.WriteLine($"Showing Docker Compose logs in {composeDir}...");
-        CommandRunner.Run("docker", "compose logs -f --tail 100", composeDir);
+        CommandRunner.Run("docker", "compose logs -f --tail 100", composeDir, GetComposeEnvironment());
+    }
+
+    private IReadOnlyDictionary<string, string> GetComposeEnvironment()
+    {
+        var env = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        if (!string.IsNullOrWhiteSpace(_config.DockerBuildContextApi))
+        {
+            env["API_BUILD_CONTEXT"] = _config.DockerBuildContextApi;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_config.DockerfileApi))
+        {
+            env["API_DOCKERFILE"] = _config.DockerfileApi;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_config.DockerBuildContextClient))
+        {
+            env["CLIENT_BUILD_CONTEXT"] = _config.DockerBuildContextClient;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_config.DockerfileClient))
+        {
+            env["CLIENT_DOCKERFILE"] = _config.DockerfileClient;
+        }
+
+        return env;
     }
 
     private IEnumerable<string> GetServiceFolders()

@@ -9,6 +9,10 @@ internal sealed class AppConfig
     public string GitRootPath { get; set; } = "..";
     public string DockerComposeFile { get; set; } = "../docker-compose.yml";
     public bool UseDockerCompose { get; set; } = true;
+    public string DockerBuildContextApi { get; set; } = "../Api/WebParserApi/WebApi";
+    public string DockerfileApi { get; set; } = "Dockerfile";
+    public string DockerBuildContextClient { get; set; } = "../Client/web-parser-client";
+    public string DockerfileClient { get; set; } = "Dockerfile";
     public List<RepoDefinition> Repositories { get; set; } = new();
 
     public static AppConfig Load(string configFilePath)
