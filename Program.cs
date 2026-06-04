@@ -56,35 +56,35 @@ while (true)
             gitHelper.PushRepos();
             break;
         case "6":
-        {
-            var branchName = AskBranchName("push");
-            if (!string.IsNullOrEmpty(branchName))
             {
-                gitHelper.PushReposBranch(branchName);
+                var branchName = AskBranchName("push");
+                if (!string.IsNullOrEmpty(branchName))
+                {
+                    gitHelper.PushReposBranch(branchName);
+                }
+                break;
             }
-            break;
-        }
         case "7":
             gitHelper.ListBranches();
             break;
         case "8":
-        {
-            var branchName = AskBranchName("checkout");
-            if (!string.IsNullOrEmpty(branchName))
             {
-                gitHelper.CheckoutBranch(branchName);
+                var branchName = AskBranchName("checkout");
+                if (!string.IsNullOrEmpty(branchName))
+                {
+                    gitHelper.CheckoutBranch(branchName);
+                }
+                break;
             }
-            break;
-        }
         case "9":
-        {
-            var branchName = AskBranchName("merge");
-            if (!string.IsNullOrEmpty(branchName))
             {
-                gitHelper.MergeBranch(branchName);
+                var branchName = AskBranchName("merge");
+                if (!string.IsNullOrEmpty(branchName))
+                {
+                    gitHelper.MergeBranch(branchName);
+                }
+                break;
             }
-            break;
-        }
         case "10":
             dockerHelper.BuildAll();
             break;
