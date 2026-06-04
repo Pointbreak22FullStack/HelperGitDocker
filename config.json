@@ -8,6 +8,8 @@
   "DockerfileApi": "Dockerfile",
   "DockerBuildContextClient": "../Client/web-parser-client",
   "DockerfileClient": "Dockerfile",
+  "DockerBuildContextIdentity": "../Api/WebParserApi",
+  "DockerfileIdentity": "Identity/Dockerfile",
   "Repositories": [
     {
       "Name": "Api",
@@ -18,11 +20,6 @@
       "Name": "Client",
       "Path": "../Client/web-parser-client",
       "CloneUrl": "https://github.com/Pointbreak22FullStack/WebParserClient.git"
-    },
-    {
-      "Name": "HelperGitDocker",
-      "Path": ".",
-      "CloneUrl": "https://github.com/Pointbreak22FullStack/HelperGitDocker.git"
     }
   ]
 }

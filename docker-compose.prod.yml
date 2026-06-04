@@ -1,0 +1,40 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+      - identity
+      - client
+    restart: unless-stopped
+
+  api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # For local testing: http://localhost/  For real prod: https://id.webparser.com/
+      - Authentication__Authority=${AUTH_AUTHORITY:-http://localhost/}
+      - Authentication__MetadataAddress=http://identity:8080/.well-known/openid-configuration
+    ports: !reset []
+
+  identity:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # For local testing: http://localhost  For real prod: https://id.webparser.com
+      - Identity__Issuer=${IDENTITY_ISSUER:-http://localhost}
+      - Identity__RedirectUris=${ALLOWED_REDIRECT_URIS:-http://localhost/auth/callback}
+      - Identity__PostLogoutRedirectUris=${ALLOWED_LOGOUT_URIS:-http://localhost/login}
+    ports: !reset []
+
+  client:
+    build:
+      args:
+        # prod-local = relative URLs via nginx (for local testing)
+        # production = absolute domain URLs (for real prod with domain)
+        - BUILD_CONFIGURATION=${CLIENT_BUILD_CONFIG:-prod-local}
+        - NGINX_CONFIG=nginx.prod.conf
+    ports: !reset []

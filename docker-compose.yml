@@ -4,33 +4,64 @@ services:
       context: ${API_BUILD_CONTEXT:-../Api/WebParserApi}
       dockerfile: ${API_DOCKERFILE:-Dockerfile}
     ports:
-      - "5000:80"
+      - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=webparser;Username=webparser;Password=Secret123!
-      - Redis__Configuration=redis:6379
+      - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false
       - Camoufox__Endpoint=http://camoufox:3000
+      # Identity issuer as seen from the browser (external port)
+      - Authentication__Authority=http://localhost:5001/
+      # Internal Docker URL to fetch JWKS/discovery without going through the host
+      - Authentication__MetadataAddress=http://identity:8080/.well-known/openid-configuration
     depends_on:
-      - postgres
-      - redis
-      - camoufox
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      identity:
+        condition: service_started
+
+  identity:
+    build:
+      context: ${IDENTITY_BUILD_CONTEXT:-../Api/WebParserApi}
+      dockerfile: ${IDENTITY_DOCKERFILE:-Identity/Dockerfile}
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__IdentityDb=Host=postgres;Port=5432;Database=webparser_identity;Username=webparser;Password=Secret123!
+      # Must match what the browser uses to reach Identity
+      - Identity__Issuer=http://localhost:5001
+      - Identity__RedirectUris=http://localhost:4200/auth/callback
+      - Identity__PostLogoutRedirectUris=http://localhost:4200/login
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   client:
     build:
       context: ${CLIENT_BUILD_CONTEXT:-../Client/web-parser-client}
       dockerfile: ${CLIENT_DOCKERFILE:-Dockerfile}
+      args:
+        - BUILD_CONFIGURATION=docker-dev
+        - NGINX_CONFIG=nginx.dev.conf
     ports:
       - "4200:80"
-    environment:
-      - API_BASE_URL=http://api:80
     depends_on:
       - api
+      - identity
 
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   postgres:
     image: postgres:16-alpine
@@ -40,9 +71,15 @@ services:
       - POSTGRES_DB=webparser
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres-init:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U webparser -d webparser"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   camoufox:
     build:

@@ -13,6 +13,8 @@ internal sealed class AppConfig
     public string DockerfileApi { get; set; } = "Dockerfile";
     public string DockerBuildContextClient { get; set; } = "../Client/web-parser-client";
     public string DockerfileClient { get; set; } = "Dockerfile";
+    public string DockerBuildContextIdentity { get; set; } = "../Api/WebParserApi";
+    public string DockerfileIdentity { get; set; } = "Identity/Dockerfile";
     public List<RepoDefinition> Repositories { get; set; } = new();
 
     public static AppConfig Load(string configFilePath)

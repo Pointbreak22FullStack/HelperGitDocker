@@ -40,10 +40,13 @@ while (true)
     Console.WriteLine("8 - Checkout ветки во всех репозиториях");
     Console.WriteLine("9 - Merge ветки во всех репозиториях");
     Console.WriteLine("10 - Построить Docker образы");
-    Console.WriteLine("11 - Запустить Docker Compose");
+    Console.WriteLine("11 - Запустить Docker Compose (dev)");
     Console.WriteLine("12 - Остановить Docker Compose");
     Console.WriteLine("13 - Показать логи Docker Compose");
     Console.WriteLine("14 - Выход");
+    Console.WriteLine("15 - Запустить Docker Compose (prod — с nginx и SSL)");
+    Console.WriteLine("16 - Пересобрать и перезапустить один сервис [dev]");
+    Console.WriteLine("17 - Пересобрать и перезапустить один сервис [prod]");
     Console.Write("Команда: ");
 
     var input = Console.ReadLine()?.Trim();
@@ -115,8 +118,25 @@ while (true)
             break;
         case "14":
             return;
+        case "15":
+            dockerHelper.UpProd();
+            break;
+        case "16":
+            {
+                var svc = AskServiceName();
+                if (!string.IsNullOrEmpty(svc))
+                    dockerHelper.RebuildService(svc, isProd: false);
+                break;
+            }
+        case "17":
+            {
+                var svc = AskServiceName();
+                if (!string.IsNullOrEmpty(svc))
+                    dockerHelper.RebuildService(svc, isProd: true);
+                break;
+            }
         default:
-            Console.WriteLine("Неизвестная команда. Введите число от 1 до 14.");
+            Console.WriteLine("Неизвестная команда. Введите число от 1 до 17.");
             break;
     }
 
@@ -127,4 +147,17 @@ static string AskBranchName(string action)
 {
     Console.Write($"Введите имя ветки для {action}: ");
     return Console.ReadLine()?.Trim() ?? string.Empty;
+}
+
+static string AskServiceName()
+{
+    Console.Write("Сервис (api / client / identity / camoufox): ");
+    var svc = Console.ReadLine()?.Trim().ToLowerInvariant() ?? string.Empty;
+    var allowed = new[] { "api", "client", "identity", "camoufox" };
+    if (!allowed.Contains(svc))
+    {
+        Console.WriteLine($"Неизвестный сервис '{svc}'. Допустимые: {string.Join(", ", allowed)}");
+        return string.Empty;
+    }
+    return svc;
 }

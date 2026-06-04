@@ -55,6 +55,69 @@ internal sealed class DockerHelper
         CommandRunner.Run("docker", "compose up -d", composeDir, GetComposeEnvironment());
     }
 
+    public void UpProd()
+    {
+        if (!TryGetComposePath(out var composeFilePath))
+        {
+            Console.WriteLine("docker-compose.yml not found.");
+            return;
+        }
+
+        var prodComposePath = Path.GetFullPath(Path.Combine(_rootPath, "docker-compose.prod.yml"));
+        if (!File.Exists(prodComposePath))
+        {
+            Console.WriteLine($"docker-compose.prod.yml not found at {prodComposePath}.");
+            return;
+        }
+
+        var composeDir = Path.GetDirectoryName(composeFilePath);
+        Console.WriteLine($"Starting Production Docker Compose in {composeDir}...");
+        CommandRunner.Run("docker",
+            $"compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build",
+            composeDir, GetComposeEnvironment());
+    }
+
+    public void RebuildService(string service, bool isProd)
+    {
+        if (!TryGetComposePath(out var composeFilePath))
+        {
+            Console.WriteLine("docker-compose.yml not found.");
+            return;
+        }
+
+        var composeDir = Path.GetDirectoryName(composeFilePath);
+        var composeArgs = isProd ? BuildProdArgs(composeDir) : "";
+
+        if (composeArgs == null) return;
+
+        Console.WriteLine($"[{(isProd ? "prod" : "dev")}] Building {service}...");
+        var buildExit = CommandRunner.Run("docker",
+            $"compose {composeArgs}build {service}",
+            composeDir, GetComposeEnvironment());
+
+        if (buildExit != 0)
+        {
+            Console.WriteLine($"Build failed for {service}. Aborting restart.");
+            return;
+        }
+
+        Console.WriteLine($"[{(isProd ? "prod" : "dev")}] Restarting {service} (without touching other containers)...");
+        CommandRunner.Run("docker",
+            $"compose {composeArgs}up -d --no-deps --force-recreate {service}",
+            composeDir, GetComposeEnvironment());
+    }
+
+    private string? BuildProdArgs(string? composeDir)
+    {
+        var prodComposePath = Path.GetFullPath(Path.Combine(_rootPath, "docker-compose.prod.yml"));
+        if (!File.Exists(prodComposePath))
+        {
+            Console.WriteLine($"docker-compose.prod.yml not found at {prodComposePath}.");
+            return null;
+        }
+        return "-f docker-compose.yml -f docker-compose.prod.yml ";
+    }
+
     public void DownAll()
     {
         if (!TryGetComposePath(out var composeFilePath))
@@ -103,6 +166,16 @@ internal sealed class DockerHelper
         if (!string.IsNullOrWhiteSpace(_config.DockerfileClient))
         {
             env["CLIENT_DOCKERFILE"] = _config.DockerfileClient;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_config.DockerBuildContextIdentity))
+        {
+            env["IDENTITY_BUILD_CONTEXT"] = _config.DockerBuildContextIdentity;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_config.DockerfileIdentity))
+        {
+            env["IDENTITY_DOCKERFILE"] = _config.DockerfileIdentity;
         }
 
         return env;
