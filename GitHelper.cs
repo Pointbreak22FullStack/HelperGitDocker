@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace HelperGitDocker;
 
 internal sealed class GitHelper
@@ -135,6 +137,203 @@ internal sealed class GitHelper
             if (exit != 0)
             {
                 Console.WriteLine($"Git push failed for {repo.Name}. Fix local branch or remote configuration.");
+            }
+        }
+    }
+
+    public void PushReposBranch(string branchName)
+    {
+        var repos = ResolveRepos();
+        if (repos.Count == 0)
+        {
+            Console.WriteLine("No repositories found to push branch.");
+            return;
+        }
+
+        foreach (var repo in repos)
+        {
+            Console.WriteLine($"\n=== Push branch {branchName} in {repo.Name} ({repo.Path}) ===");
+            if (!Directory.Exists(repo.Path) || !Directory.Exists(Path.Combine(repo.Path, ".git")))
+            {
+                Console.WriteLine("Repository path is missing or not a git repository. Skipping.");
+                continue;
+            }
+
+            var exit = CommandRunner.Run("git", $"push origin \"{branchName}\"", repo.Path);
+            if (exit != 0)
+            {
+                Console.WriteLine($"Git push failed for {repo.Name}. Fix local branch or remote configuration.");
+            }
+        }
+    }
+
+    public void ShowStatusOnlyChanged()
+    {
+        var repos = ResolveRepos();
+        if (repos.Count == 0)
+        {
+            Console.WriteLine("No repositories found to show status.");
+            return;
+        }
+
+        foreach (var repo in repos)
+        {
+            if (!Directory.Exists(repo.Path) || !Directory.Exists(Path.Combine(repo.Path, ".git")))
+            {
+                continue;
+            }
+
+            var output = GetCommandOutput("git", "status --short", repo.Path);
+            if (string.IsNullOrWhiteSpace(output))
+            {
+                continue;
+            }
+
+            Console.WriteLine($"\n=== Modified repository: {repo.Name} ({repo.Path}) ===");
+            Console.WriteLine(output);
+        }
+    }
+
+    public void ShowDiffOnlyChanged()
+    {
+        var repos = ResolveRepos();
+        if (repos.Count == 0)
+        {
+            Console.WriteLine("No repositories found to show diff.");
+            return;
+        }
+
+        foreach (var repo in repos)
+        {
+            if (!Directory.Exists(repo.Path) || !Directory.Exists(Path.Combine(repo.Path, ".git")))
+            {
+                continue;
+            }
+
+            var status = GetCommandOutput("git", "status --short", repo.Path);
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                continue;
+            }
+
+            Console.WriteLine($"\n=== Diff for modified repository: {repo.Name} ({repo.Path}) ===");
+            CommandRunner.Run("git", "diff", repo.Path);
+        }
+    }
+
+    private static string GetCommandOutput(string fileName, string arguments, string workingDirectory)
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = fileName,
+                Arguments = arguments,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WorkingDirectory = workingDirectory
+            };
+
+            using var process = Process.Start(startInfo);
+            if (process == null)
+            {
+                return string.Empty;
+            }
+
+            var output = process.StandardOutput.ReadToEnd();
+            process.WaitForExit();
+            return output?.Trim() ?? string.Empty;
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+    public void ListBranches()
+    {
+        var repos = ResolveRepos();
+        if (repos.Count == 0)
+        {
+            Console.WriteLine("No repositories found to list branches.");
+            return;
+        }
+
+        foreach (var repo in repos)
+        {
+            Console.WriteLine($"\n=== Branches in {repo.Name} ({repo.Path}) ===");
+            if (!Directory.Exists(repo.Path) || !Directory.Exists(Path.Combine(repo.Path, ".git")))
+            {
+                Console.WriteLine("Repository path is missing or not a git repository. Skipping.");
+                continue;
+            }
+
+            CommandRunner.Run("git", "branch --all", repo.Path);
+        }
+    }
+
+    public void CheckoutBranch(string branchName)
+    {
+        if (string.IsNullOrWhiteSpace(branchName))
+        {
+            Console.WriteLine("Branch name is required.");
+            return;
+        }
+
+        var repos = ResolveRepos();
+        if (repos.Count == 0)
+        {
+            Console.WriteLine("No repositories found to checkout branch.");
+            return;
+        }
+
+        foreach (var repo in repos)
+        {
+            Console.WriteLine($"\n=== Checkout {branchName} in {repo.Name} ({repo.Path}) ===");
+            if (!Directory.Exists(repo.Path) || !Directory.Exists(Path.Combine(repo.Path, ".git")))
+            {
+                Console.WriteLine("Repository path is missing or not a git repository. Skipping.");
+                continue;
+            }
+
+            var exit = CommandRunner.Run("git", $"checkout \"{branchName}\"", repo.Path);
+            if (exit != 0)
+            {
+                Console.WriteLine($"Git checkout failed for {repo.Name}. Check if branch exists or if repository is clean.");
+            }
+        }
+    }
+
+    public void MergeBranch(string branchName)
+    {
+        if (string.IsNullOrWhiteSpace(branchName))
+        {
+            Console.WriteLine("Branch name is required.");
+            return;
+        }
+
+        var repos = ResolveRepos();
+        if (repos.Count == 0)
+        {
+            Console.WriteLine("No repositories found to merge branch.");
+            return;
+        }
+
+        foreach (var repo in repos)
+        {
+            Console.WriteLine($"\n=== Merge {branchName} into current branch in {repo.Name} ({repo.Path}) ===");
+            if (!Directory.Exists(repo.Path) || !Directory.Exists(Path.Combine(repo.Path, ".git")))
+            {
+                Console.WriteLine("Repository path is missing or not a git repository. Skipping.");
+                continue;
+            }
+
+            var exit = CommandRunner.Run("git", $"merge \"{branchName}\"", repo.Path);
+            if (exit != 0)
+            {
+                Console.WriteLine($"Git merge failed for {repo.Name}. Resolve conflicts locally and retry if needed.");
             }
         }
     }

@@ -1,5 +1,5 @@
 {
-  "Organization": "your-org-name",
+  "Organization": "Pointbreak22FullStack",
   "GitHost": "github.com",
   "GitRootPath": "..",
   "DockerComposeFile": "docker-compose.yml",
@@ -8,12 +8,17 @@
     {
       "Name": "Api",
       "Path": "../Api",
-      "CloneUrl": "https://github.com/your-org-name/WebParserApi.git"
+      "CloneUrl": "https://github.com/Pointbreak22FullStack/WebParserApi.git"
     },
     {
       "Name": "Client",
       "Path": "../Client/web-parser-client",
-      "CloneUrl": "https://github.com/your-org-name/WebParserClient.git"
+      "CloneUrl": "https://github.com/Pointbreak22FullStack/WebParserClient.git"
+    },
+    {
+      "Name": "HelperGitDocker",
+      "Path": ".",
+      "CloneUrl": "https://github.com/Pointbreak22FullStack/HelperGitDocker.git"
     }
   ]
 }

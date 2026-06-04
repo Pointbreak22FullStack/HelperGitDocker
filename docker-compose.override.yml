@@ -1,0 +1,15 @@
+services:
+  api:
+    restart: no
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  client:
+    restart: no
+    environment:
+      - NODE_ENV=development
+
+  camoufox:
+    restart: no
+    environment:
+      - DISPLAY=:99

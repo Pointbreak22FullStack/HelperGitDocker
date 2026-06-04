@@ -55,6 +55,32 @@ internal sealed class DockerHelper
         CommandRunner.Run("docker", "compose up -d", composeDir);
     }
 
+    public void DownAll()
+    {
+        if (!TryGetComposePath(out var composeFilePath))
+        {
+            Console.WriteLine("Docker Compose file not configured or not found. Create a docker-compose.yml and set DockerComposeFile in config.json.");
+            return;
+        }
+
+        var composeDir = Path.GetDirectoryName(composeFilePath);
+        Console.WriteLine($"Stopping Docker Compose in {composeDir}...");
+        CommandRunner.Run("docker", "compose down", composeDir);
+    }
+
+    public void LogsAll()
+    {
+        if (!TryGetComposePath(out var composeFilePath))
+        {
+            Console.WriteLine("Docker Compose file not configured or not found. Create a docker-compose.yml and set DockerComposeFile in config.json.");
+            return;
+        }
+
+        var composeDir = Path.GetDirectoryName(composeFilePath);
+        Console.WriteLine($"Showing Docker Compose logs in {composeDir}...");
+        CommandRunner.Run("docker", "compose logs -f --tail 100", composeDir);
+    }
+
     private IEnumerable<string> GetServiceFolders()
     {
         var root = Path.GetFullPath(Path.Combine(_rootPath, _config.GitRootPath));

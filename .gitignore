@@ -1,0 +1,30 @@
+# .NET build artifacts
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userprefs
+*.vsp
+
+# Visual Studio files
+.vs/
+*.csproj.user
+
+# Build output
+*.dll
+*.exe
+*.pdb
+*.cache
+
+# Logs
+*.log
+
+# IDE directories
+.idea/
+.vscode/
+
+# OS files
+Thumbs.db
+.DS_Store
