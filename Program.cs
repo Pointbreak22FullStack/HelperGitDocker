@@ -1,8 +1,24 @@
 ﻿using HelperGitDocker;
+using System.Reflection;
 
 const string configFile = "config.json";
+
+// Получаем директорию, где находится исполняемый файл HelperGitDocker
+var applicationPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? Directory.GetCurrentDirectory();
+var configFilePath = Path.Combine(applicationPath, configFile);
+
+// Если config.json не найден в директории приложения, ищем в текущей рабочей директории
+if (!File.Exists(configFilePath))
+{
+    var alternativeConfigPath = Path.Combine(Directory.GetCurrentDirectory(), configFile);
+    if (File.Exists(alternativeConfigPath))
+    {
+        configFilePath = alternativeConfigPath;
+    }
+}
+
 var rootPath = Directory.GetCurrentDirectory();
-var config = AppConfig.Load(Path.Combine(rootPath, configFile));
+var config = AppConfig.Load(configFilePath);
 var gitHelper = new GitHelper(config, rootPath);
 var dockerHelper = new DockerHelper(config, rootPath);
 

@@ -1,7 +1,7 @@
 services:
   api:
     build:
-      context: ${API_BUILD_CONTEXT:-../Api/WebParserApi/WebApi}
+      context: ${API_BUILD_CONTEXT:-../Api/WebParserApi}
       dockerfile: ${API_DOCKERFILE:-Dockerfile}
     ports:
       - "5000:80"

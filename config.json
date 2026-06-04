@@ -4,6 +4,10 @@
   "GitRootPath": "..",
   "DockerComposeFile": "docker-compose.yml",
   "UseDockerCompose": true,
+  "DockerBuildContextApi": "../Api/WebParserApi",
+  "DockerfileApi": "Dockerfile",
+  "DockerBuildContextClient": "../Client/web-parser-client",
+  "DockerfileClient": "Dockerfile",
   "Repositories": [
     {
       "Name": "Api",
