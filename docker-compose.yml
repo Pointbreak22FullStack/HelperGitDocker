@@ -7,7 +7,11 @@ services:
       - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=webparser;Username=webparser;Password=Secret123!
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=webparser;Username=webparser;Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD не задан, см. .env.example}
+      # Ключ шифрования паролей аккаунтов/прокси в БД. Потеря ключа = потеря сохранённых паролей!
+      - Encryption__Key=${ENCRYPTION_KEY:?ENCRYPTION_KEY не задан, см. .env.example}
+      # Секрет для POST /api/code (заголовок X-Webhook-Secret)
+      - CodeWebhook__Secret=${CODE_WEBHOOK_SECRET:-}
       - ConnectionStrings__RedisConnection=redis:6379,abortConnect=false
       - Camoufox__Endpoint=http://camoufox:3000
       # Identity issuer as seen from the browser (external port)
@@ -30,7 +34,7 @@ services:
       - "5001:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__IdentityDb=Host=postgres;Port=5432;Database=webparser_identity;Username=webparser;Password=Secret123!
+      - ConnectionStrings__IdentityDb=Host=postgres;Port=5432;Database=webparser_identity;Username=webparser;Password=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD не задан, см. .env.example}
       # Must match what the browser uses to reach Identity
       - Identity__Issuer=http://localhost:5001
       - Identity__RedirectUris=http://localhost:4200/auth/callback
@@ -67,7 +71,7 @@ services:
     image: postgres:16-alpine
     environment:
       - POSTGRES_USER=webparser
-      - POSTGRES_PASSWORD=Secret123!
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?POSTGRES_PASSWORD не задан, см. .env.example}
       - POSTGRES_DB=webparser
     volumes:
       - postgres_data:/var/lib/postgresql/data
