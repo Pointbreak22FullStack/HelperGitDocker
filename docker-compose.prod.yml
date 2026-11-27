@@ -19,6 +19,8 @@ services:
       # For local testing: http://localhost/  For real prod: https://id.webparser.com/
       - Authentication__Authority=${AUTH_AUTHORITY:-http://localhost/}
       - Authentication__MetadataAddress=http://identity:8080/.well-known/openid-configuration
+      # Адрес фронтенда, которому разрешены запросы к API (CORS)
+      - Cors__AllowedOrigins__0=${CLIENT_ORIGIN:-http://localhost}
     ports: !reset []
 
   identity:

@@ -21,13 +21,13 @@ jobs:
 
       - name: Restore dependencies
         run: dotnet restore HelperGitDocker.csproj
-        working-directory: ./HelperGitDocker
 
       - name: Build HelperGitDocker
-        run: dotnet build --configuration Release HelperGitDocker.csproj
-        working-directory: ./HelperGitDocker
+        run: dotnet build --configuration Release --no-restore HelperGitDocker.csproj
 
       - name: Validate Docker Compose
-        run: |
-          cd HelperGitDocker
-          docker compose config
+        env:
+          # Фиктивные значения только для проверки синтаксиса compose
+          POSTGRES_PASSWORD: ci-dummy
+          ENCRYPTION_KEY: Y2ktZHVtbXkta2V5LWNpLWR1bW15LWtleS0wMDAwMDA=
+        run: docker compose config --quiet
